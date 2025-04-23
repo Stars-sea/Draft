@@ -1,7 +1,7 @@
-﻿using System.Text.Encodings.Web;
-using System.Text.Json;
-using Draft;
+﻿using Draft;
 using HtmlAgilityPack;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 const string url = "https://movie.douban.com/top250";
 
@@ -10,29 +10,39 @@ HtmlWeb web = new()
     UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
 };
 
-List<DoubanMovie> movies = [];
-for (var i = 0; i < 10; i++)
-{
-    string currentUrl = i == 0 ? url : $"{url}?start={i * 25}&filter=";
-    movies.AddRange(await FetchDoubanPage(currentUrl));
+await using DoubanMovieDbContext dbContext = new();
+
+try {
+    if (dbContext.Database.GetService<IDatabaseCreator>() is not RelationalDatabaseCreator creator)
+        throw new NullReferenceException("RelationalDatabaseCreator is null");
+    await creator.EnsureCreatedAsync();
+}
+catch (Exception e) {
+    Console.WriteLine(e);
+    throw;
 }
 
-if (File.Exists("movies.json"))
-    File.Delete("movies.json");
-
-await using FileStream file = File.OpenWrite("movies.json");
-await JsonSerializer.SerializeAsync(file, movies, new JsonSerializerOptions()
+for (var i = 0; i < 250; i += 25)
 {
-    WriteIndented = true,
-    Encoder       = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-});
+    var nodes = await FetchDoubanPageNodes(i);
+    var movies = nodes.Select(DoubanMovie.ParseFromHtml).ToArray();
 
-return ;
+    await dbContext.Movies.AddRangeAsync(movies);
+}
 
-async Task<IEnumerable<DoubanMovie>> FetchDoubanPage(string currentUrl)
+await dbContext.SaveChangesAsync();
+
+return;
+
+async Task<IEnumerable<HtmlNode>> FetchDoubanPageNodes(int start)
 {
-    HtmlDocument doc = await web.LoadFromWebAsync(currentUrl);
-    HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//div[@class='item']") ?? throw new InvalidOperationException();
-
-    return nodes.Select(DoubanMovie.ParseFromHtml);
+    string currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
+    HtmlDocument document = await web.LoadFromWebAsync(currentUrl);
+    while (document.Text.Contains("有异常请求"))
+    {
+        Console.WriteLine($"被服务器盯住啦_(:з)∠)_, 歇一会~ [{currentUrl}]");
+        await Task.Delay(60_000);
+        document = await web.LoadFromWebAsync(currentUrl);
+    }
+    return document.DocumentNode.SelectNodes("//div[@class='item']") ?? throw new NullReferenceException();
 }

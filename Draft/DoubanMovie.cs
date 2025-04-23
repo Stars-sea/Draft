@@ -5,8 +5,8 @@ namespace Draft;
 
 public partial record DoubanMovie(
     string Title,
-    string[] OtherTitles,
-    string[] Descriptions,
+    ICollection<string> OtherTitles,
+    ICollection<string> Descriptions,
     float Rating,
     int RatingCount,
     string? Quote,
