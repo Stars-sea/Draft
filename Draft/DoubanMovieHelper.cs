@@ -1,18 +1,10 @@
 ﻿using System.Text.RegularExpressions;
+using Draft.Server.Models;
 using HtmlAgilityPack;
 
 namespace Draft;
 
-public partial record DoubanMovie(
-    string Title,
-    ICollection<string> OtherTitles,
-    ICollection<string> Descriptions,
-    float Rating,
-    int RatingCount,
-    string? Quote,
-    string Url,
-    string PreviewImage
-) {
+public static partial class DoubanMovieHelper {
     public static DoubanMovie ParseFromHtml(HtmlNode node) {
         HtmlNode ratingNode = node.SelectSingleNode(".//span[@class='rating_num']")!;
 

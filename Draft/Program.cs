@@ -10,10 +10,10 @@ HtmlWeb web = new() {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
 };
 
-await using DoubanMovieDbContext dbContext = new();
+await using DoubanMovieDb db = new();
 
 try {
-    if (dbContext.Database.GetService<IDatabaseCreator>() is not RelationalDatabaseCreator creator)
+    if (db.Database.GetService<IDatabaseCreator>() is not RelationalDatabaseCreator creator)
         throw new NullReferenceException("RelationalDatabaseCreator is null");
     await creator.EnsureCreatedAsync();
 }
@@ -24,12 +24,12 @@ catch (Exception e) {
 
 for (var i = 0; i < 250; i += 25) {
     var nodes  = await FetchDoubanPageNodes(i);
-    var movies = nodes.Select(DoubanMovie.ParseFromHtml).ToArray();
+    var movies = nodes.Select(DoubanMovieHelper.ParseFromHtml).ToArray();
 
-    await dbContext.Movies.AddRangeAsync(movies);
+    await db.Movies.AddRangeAsync(movies);
 }
 
-await dbContext.SaveChangesAsync();
+await db.SaveChangesAsync();
 
 return;
 

@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Draft.Server.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Draft;
 
-public class DoubanMovieDbContext : DbContext {
+public class DoubanMovieDb : DbContext {
 
     private const string Server       = "localhost";
     private const string DatabaseName = "douban_movies";

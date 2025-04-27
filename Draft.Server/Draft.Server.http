@@ -1,0 +1,6 @@
+@Draft.Server_HostAddress = http://localhost:5229
+
+GET {{Draft.Server_HostAddress}}/api/v0/douban-movies
+Accept: application/json
+
+###
