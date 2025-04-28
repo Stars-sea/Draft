@@ -58,3 +58,13 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+div.item {
+    display: block;
+    unicode-bidi: isolate;
+}
+
+div.picture {
+    display: block;
+    float: left;
+}

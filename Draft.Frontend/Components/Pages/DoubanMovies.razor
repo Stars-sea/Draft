@@ -1,0 +1,48 @@
+﻿@page "/movies"
+@using Draft.Frontend.Api
+@using Draft.Frontend.Models
+
+@inject IDoubanMovieApi Api
+
+<PageTitle>Douban Movies</PageTitle>
+
+<h1>Douban Movies</h1>
+
+@if (_movies is null) {
+    <p>
+        <em>Loading...</em>
+    </p>
+} else {
+    <ol>
+        @foreach (DoubanMovie movie in _movies) {
+            <li>
+                <div class="item">
+                    <div class="picture">
+                        <a href="@movie.Url">
+                            <img width="100" src="@movie.PreviewImage" alt="@movie.Title"/>
+                        </a>
+                    </div>
+                    <div>
+                        <p><a href="@movie.Url">@movie.Title</a></p>
+                        <p>
+                            <span>@movie.Descriptions[0]</span>
+                            <br/>
+                            <span>@movie.Descriptions[1]</span>
+                        </p>
+                        <p>@movie.Rating, Rated by @movie.RatingCount persons.</p>
+                        <p>@movie.Quote</p>
+                    </div>
+                </div>
+            </li>
+        }
+    </ol>
+}
+
+@code {
+    private List<DoubanMovie>? _movies;
+
+    protected override async Task OnInitializedAsync() {
+        _movies = await Api.GetDoubanMovies();
+    }
+
+}
