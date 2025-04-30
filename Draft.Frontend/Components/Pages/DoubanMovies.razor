@@ -16,21 +16,23 @@
     <ol>
         @foreach (DoubanMovie movie in _movies) {
             <li>
-                <div class="item">
-                    <div class="picture">
+                <div class="item" style="display: flex; padding: 16px">
+                    <div class="picture" style="width: 150px; float: left; margin-right: 16px">
                         <a href="@movie.Url">
-                            <img width="100" src="@movie.PreviewImage" alt="@movie.Title"/>
+                            <img width="150" height="100%" src="/img/@movie.Title" alt="@movie.Title"/>
                         </a>
                     </div>
-                    <div>
-                        <p><a href="@movie.Url">@movie.Title</a></p>
-                        <p>
-                            <span>@movie.Descriptions[0]</span>
-                            <br/>
-                            <span>@movie.Descriptions[1]</span>
-                        </p>
-                        <p>@movie.Rating, Rated by @movie.RatingCount persons.</p>
-                        <p>@movie.Quote</p>
+                    <div style="display: flex; justify-content: space-between; flex-direction: column">
+                        <h2 style="font-size: x-large"><a href="@movie.Url">@movie.Title</a></h2>
+                        <div>
+                            <p>
+                                <span>@movie.Descriptions[0]</span>
+                                <br/>
+                                <span>@movie.Descriptions[1]</span>
+                            </p>
+                            <p>@movie.Rating, Rated by @movie.RatingCount persons.</p>
+                            <p>@movie.Quote </p>
+                        </div>
                     </div>
                 </div>
             </li>

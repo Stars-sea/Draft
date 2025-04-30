@@ -1,3 +1,4 @@
+using Draft.Frontend;
 using Draft.Frontend.Api;
 using Draft.Frontend.Components;
 using Refit;
@@ -29,5 +30,7 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
+
+app.MapGet("img/{id}", DoubanImageProxy.GetDoubanImage);
 
 app.Run();
