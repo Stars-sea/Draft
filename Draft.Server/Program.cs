@@ -7,7 +7,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<DoubanMovieDb>(database => {
         string doubanMoviesConnectionString = builder.Configuration.GetConnectionString("DOUBAN_MOVIES_DATABASE")!;
-        database.UseMySql(doubanMoviesConnectionString, ServerVersion.AutoDetect(doubanMoviesConnectionString));
+        database.UseMySQL(doubanMoviesConnectionString);
     }
 );
 

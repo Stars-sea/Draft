@@ -1,7 +1,6 @@
 ﻿using Draft;
+using Draft.Server.Models;
 using HtmlAgilityPack;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 
 const string url = "https://movie.douban.com/top250";
 
@@ -12,28 +11,27 @@ HtmlWeb web = new() {
 
 await using DoubanMovieDb db = new();
 
-try {
-    if (db.Database.GetService<IDatabaseCreator>() is not RelationalDatabaseCreator creator)
-        throw new NullReferenceException("RelationalDatabaseCreator is null");
-    await creator.EnsureCreatedAsync();
-}
-catch (Exception e) {
-    Console.WriteLine(e);
-    throw;
-}
+db.Database.EnsureCreated();
 
 for (var i = 0; i < 250; i += 25) {
-    var nodes  = await FetchDoubanPageNodes(i);
-    var movies = nodes.Select(DoubanMovieHelper.ParseFromHtml).ToArray();
-
-    await db.Movies.AddRangeAsync(movies);
+    await foreach (DoubanMovie movie in FetchDoubanMovies(i)) await db.Movies.AddAsync(movie);
+    await db.SaveChangesAsync();
 }
-
-await db.SaveChangesAsync();
 
 return;
 
-async Task<IEnumerable<HtmlNode>> FetchDoubanPageNodes(int start) {
+// async Task<IEnumerable<HtmlNode>> FetchDoubanPageNodes(int start) {
+//     string       currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
+//     HtmlDocument document   = await web.LoadFromWebAsync(currentUrl);
+//     while (document.Text.Contains("有异常请求")) {
+//         Console.WriteLine($"被服务器盯住啦_(:з)∠)_, 歇一会~ [{currentUrl}]");
+//         await Task.Delay(60_000);
+//         document = await web.LoadFromWebAsync(currentUrl);
+//     }
+//     return document.DocumentNode.SelectNodes("//div[@class='item']") ?? throw new NullReferenceException();
+// }
+
+async IAsyncEnumerable<DoubanMovie> FetchDoubanMovies(int start) {
     string       currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
     HtmlDocument document   = await web.LoadFromWebAsync(currentUrl);
     while (document.Text.Contains("有异常请求")) {
@@ -41,5 +39,7 @@ async Task<IEnumerable<HtmlNode>> FetchDoubanPageNodes(int start) {
         await Task.Delay(60_000);
         document = await web.LoadFromWebAsync(currentUrl);
     }
-    return document.DocumentNode.SelectNodes("//div[@class='item']") ?? throw new NullReferenceException();
+
+    HtmlNodeCollection nodes = document.DocumentNode.SelectNodes("//div[@class='item']")!;
+    for (var i = 0; i < nodes.Count; ++i) yield return DoubanMovieHelper.ParseFromHtml(nodes[i], start + i);
 }

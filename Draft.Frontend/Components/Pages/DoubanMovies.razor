@@ -26,9 +26,9 @@
                         <h2 style="font-size: x-large"><a href="@movie.Url">@movie.Title</a></h2>
                         <div>
                             <p>
-                                <span>@movie.Descriptions[0]</span>
+                                <span>@movie.StaffInfos</span>
                                 <br/>
-                                <span>@movie.Descriptions[1]</span>
+                                <span>@movie.Year / @movie.Region / @string.Join(' ', movie.Tags)</span>
                             </p>
                             <p>@movie.Rating, Rated by @movie.RatingCount persons.</p>
                             <p>@movie.Quote </p>
@@ -44,7 +44,7 @@
     private List<DoubanMovie>? _movies;
 
     protected override async Task OnInitializedAsync() {
-        _movies = await Api.GetDoubanMovies();
+        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).ToList();
     }
 
 }

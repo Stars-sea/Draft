@@ -19,7 +19,12 @@ public static class DoubanMoviesApi {
         Results.Ok(await database.Movies.ToListAsync());
 
     private static async Task<IResult> GetMovieTitles(DoubanMovieDb database) {
-        return Results.Ok(await database.Movies.Select(m => m.Title).ToListAsync());
+        return Results.Ok(
+            await database.Movies
+                          .OrderBy(m => m.Rank)
+                          .Select(m => m.Title)
+                          .ToListAsync()
+        );
     }
 
     private static async Task<IResult> GetMovieEntry(string id, DoubanMovieDb database) =>
