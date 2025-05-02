@@ -20,17 +20,6 @@ for (var i = 0; i < 250; i += 25) {
 
 return;
 
-// async Task<IEnumerable<HtmlNode>> FetchDoubanPageNodes(int start) {
-//     string       currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
-//     HtmlDocument document   = await web.LoadFromWebAsync(currentUrl);
-//     while (document.Text.Contains("有异常请求")) {
-//         Console.WriteLine($"被服务器盯住啦_(:з)∠)_, 歇一会~ [{currentUrl}]");
-//         await Task.Delay(60_000);
-//         document = await web.LoadFromWebAsync(currentUrl);
-//     }
-//     return document.DocumentNode.SelectNodes("//div[@class='item']") ?? throw new NullReferenceException();
-// }
-
 async IAsyncEnumerable<DoubanMovie> FetchDoubanMovies(int start) {
     string       currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
     HtmlDocument document   = await web.LoadFromWebAsync(currentUrl);

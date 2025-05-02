@@ -40,13 +40,18 @@ public static class DoubanMoviesApi {
     }
 
     public static RouteGroupBuilder MapDoubanMoviesApi(this RouteGroupBuilder group) {
-        group.MapPost("/", CreateMovieEntry);
-        group.MapGet("/", GetMovieEntries);
+        group.MapPost("/", CreateMovieEntry)
+             .WithSummary("Creates a new movie entry");
+        group.MapGet("/", GetMovieEntries)
+             .WithSummary("Gets all movie entries");
 
-        group.MapGet("/titles", GetMovieTitles);
+        group.MapGet("/titles", GetMovieTitles)
+             .WithSummary("Gets all movie titles");
 
-        group.MapGet("/{id}", GetMovieEntry);
-        group.MapDelete("/{id}", DeleteMovieEntry);
+        group.MapGet("/{id}", GetMovieEntry)
+             .WithSummary("Gets movie entry with specified id");
+        group.MapDelete("/{id}", DeleteMovieEntry)
+             .WithSummary("Deletes movie entry with specified id");
         return group;
     }
 }
