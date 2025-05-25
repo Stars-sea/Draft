@@ -1,5 +1,6 @@
-﻿using Draft;
-using Draft.Server.Models;
+﻿using Refit;
+using Draft;
+using Draft.Models;
 using HtmlAgilityPack;
 
 const string url = "https://movie.douban.com/top250";
@@ -9,13 +10,12 @@ HtmlWeb web = new() {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
 };
 
-await using DoubanMovieDb db = new();
-
-db.Database.EnsureCreated();
+IDoubanMoviesApi api = RestService.For<IDoubanMoviesApi>("http://localhost:5229");
 
 for (var i = 0; i < 250; i += 25) {
-    await foreach (DoubanMovie movie in FetchDoubanMovies(i)) await db.Movies.AddAsync(movie);
-    await db.SaveChangesAsync();
+    await foreach (DoubanMovie movie in FetchDoubanMovies(i))
+        await api.PutDoubanMovie(movie);
+    await Task.Delay(5_000);
 }
 
 return;

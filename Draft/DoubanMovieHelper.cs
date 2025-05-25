@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Draft.Server.Models;
+using Draft.Models;
 using HtmlAgilityPack;
 
 namespace Draft;
@@ -47,7 +47,8 @@ public static partial class DoubanMovieHelper {
             RatingCount  = ratingCount,
             Quote        = quote,
             Url          = url,
-            PreviewImage = image
+            PreviewImage = image,
+            Favorites    = []
         };
     }
 

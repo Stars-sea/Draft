@@ -9,20 +9,11 @@
 
     <ItemGroup>
         <PackageReference Include="HtmlAgilityPack" Version="1.12.1"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.3"/>
+        <PackageReference Include="Refit" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Draft.Server\Draft.Server.csproj"/>
+        <ProjectReference Include="..\Draft.Models\Draft.Models.csproj" />
     </ItemGroup>
 
 </Project>

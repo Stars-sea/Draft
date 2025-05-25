@@ -1,6 +1,6 @@
 ﻿@page "/movies"
 @using Draft.Frontend.Api
-@using Draft.Frontend.Models
+@using Draft.Models
 
 @inject IDoubanMovieApi Api
 
@@ -19,7 +19,7 @@
                 <div class="item" style="display: flex; padding: 16px">
                     <div class="picture" style="width: 150px; float: left; margin-right: 16px">
                         <a href="@movie.Url">
-                            <img width="150" height="100%" src="/img/@movie.Title" alt="@movie.Title"/>
+                            <img width="150" height="100%" src="/img/@movie.Id" alt="@movie.Title"/>
                         </a>
                     </div>
                     <div style="display: flex; justify-content: space-between; flex-direction: column">
@@ -44,7 +44,7 @@
     private List<DoubanMovie>? _movies;
 
     protected override async Task OnInitializedAsync() {
-        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).ToList();
+        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).Take(20).ToList();
     }
 
 }

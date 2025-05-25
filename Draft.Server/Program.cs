@@ -1,17 +1,12 @@
-using Draft.Server;
-using Draft.Server.Database;
-using Microsoft.EntityFrameworkCore;
+using Draft.Server.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<DoubanMovieDb>(database => {
-        string doubanMoviesConnectionString = builder.Configuration.GetConnectionString("DOUBAN_MOVIES_DATABASE")!;
-        database.UseMySQL(doubanMoviesConnectionString);
-    }
-);
 
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
+
 
 WebApplication app = builder.Build();
 
@@ -19,6 +14,8 @@ WebApplication app = builder.Build();
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -1,4 +1,4 @@
-﻿using Draft.Frontend.Models;
+﻿using Draft.Models;
 using Refit;
 
 namespace Draft.Frontend.Api;
@@ -10,12 +10,12 @@ public interface IDoubanMovieApi {
     [Get("/api/v1/douban-movies")]
     public Task<List<DoubanMovie>> GetDoubanMovies();
 
-    [Get("/api/v1/douban-movies/titles")]
-    public Task<string> GetDoubanMoviesTitles();
+    [Get("/api/v1/douban-movies/simple")]
+    public Task<List<DoubanMovieSimple>> GetDoubanMoviesSimple();
 
     [Get("/api/v1/douban-movies/{id}")]
-    public Task<DoubanMovie> GetDoubanMovie(string id);
+    public Task<DoubanMovie> GetDoubanMovie(int id);
 
     [Delete("/api/v1/douban-movies/{id}")]
-    public Task DeleteDoubanMovie(string id);
+    public Task DeleteDoubanMovie(int id);
 }

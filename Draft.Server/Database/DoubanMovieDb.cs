@@ -1,16 +1,33 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
-using Draft.Server.Models;
+using Draft.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Draft.Server.Database;
 
 public class DoubanMovieDb(DbContextOptions options) : DbContext(options) {
+
+    public DbSet<UserProfile> Profiles { get; set; }
+
     public DbSet<DoubanMovie> Movies { get; set; }
+
+    public DbSet<Favorite> Favorites { get; set; }
 
     protected override void OnModelCreating(ModelBuilder model) {
         base.OnModelCreating(model);
+
+        model.Entity<Favorite>().HasKey(f => new { f.UserId, f.MovieId });
+        model.Entity<Favorite>()
+             .HasOne(f => f.User)
+             .WithMany(u => u.Favorites)
+             .HasForeignKey(f => f.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+        model.Entity<Favorite>()
+             .HasOne(f => f.Movie)
+             .WithMany(m => m.Favorites)
+             .HasForeignKey(f => f.MovieId)
+             .OnDelete(DeleteBehavior.Cascade);
 
         JsonSerializerOptions jsonSerializerOptions = new() {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -22,7 +39,7 @@ public class DoubanMovieDb(DbContextOptions options) : DbContext(options) {
         );
 
         model.Entity<DoubanMovie>(entity => {
-                entity.HasKey(m => m.Title);
+                entity.HasKey(m => m.Id);
                 entity.Property(m => m.OtherTitles).HasConversion(collectionConverter);
                 entity.Property(m => m.Tags).HasConversion(collectionConverter);
             }

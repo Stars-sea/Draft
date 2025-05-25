@@ -1,12 +1,12 @@
 ﻿using Draft.Frontend.Api;
-using Draft.Frontend.Models;
+using Draft.Models;
 
 namespace Draft.Frontend;
 
 public static class DoubanImageProxy {
     private static readonly HttpClient Client = new();
 
-    private static readonly Dictionary<string, byte[]> ImageCache = new();
+    private static readonly Dictionary<int, byte[]> ImageCache = new();
 
     static DoubanImageProxy() {
         Client.DefaultRequestHeaders.Add(
@@ -15,7 +15,7 @@ public static class DoubanImageProxy {
         );
     }
 
-    public static async Task<IResult> GetDoubanImage(string id, IDoubanMovieApi api) {
+    public static async Task<IResult> GetDoubanImage(int id, IDoubanMovieApi api) {
         if (ImageCache.TryGetValue(id, out byte[]? image)) return Results.File(image, "image/jpeg");
 
         DoubanMovie movie = await api.GetDoubanMovie(id);
@@ -24,8 +24,4 @@ public static class DoubanImageProxy {
         ImageCache[id] = bytes;
         return Results.File(bytes, "image/jpeg");
     }
-
-    public static DoubanMovie GetMapped(this DoubanMovie movie) => movie with {
-        PreviewImage = $"/img/{movie.Title}"
-    };
 }

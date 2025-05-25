@@ -10,4 +10,8 @@
         <PackageReference Include="Refit" Version="8.0.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Draft.Models\Draft.Models.csproj" />
+    </ItemGroup>
+
 </Project>
