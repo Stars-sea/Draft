@@ -1,8 +1,10 @@
 ﻿using System.Text;
+using Draft.Models;
 using Draft.Server.Database;
 using Draft.Server.Services.Impl;
 using Draft.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -13,11 +15,12 @@ public static class DependencyInjection {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         => services.AddDatabase(configuration)
                    .AddSingleton<IDateTimeProvider, DateTimeProvider>()
-                   .AddSingleton<IRandomProvider, RandomProvider>()
+                   .AddSingleton<IPasswordHasher<UserProfile>, PasswordHasher<UserProfile>>()
+                   .AddScoped<IUserProfileManager, UserProfileManager>()
                    .AddAuth(configuration);
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration) {
-        services.AddDbContext<DoubanMovieDb>(database => {
+        services.AddDbContext<ApplicationDb>(database => {
                 string doubanMoviesConnectionString = configuration.GetConnectionString("APPLICATION_DATABASE")!;
                 database.UseMySQL(doubanMoviesConnectionString);
             }

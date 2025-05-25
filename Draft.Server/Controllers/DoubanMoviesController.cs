@@ -9,9 +9,10 @@ namespace Draft.Server.Controllers;
 [Route("api/v1/douban-movies")]
 public class DoubanMoviesController : ControllerBase {
 
-    private readonly DoubanMovieDb _database;
+    // TODO: wrap with service
+    private readonly ApplicationDb _database;
 
-    public DoubanMoviesController(DoubanMovieDb database) {
+    public DoubanMoviesController(ApplicationDb database) {
         _database = database;
         _database.Database.EnsureCreated();
     }

@@ -9,7 +9,5 @@ public class UserProfile {
 
     public required string PasswordHash { get; set; }
 
-    public required int Salt { get; set; }
-
     public required ICollection<Favorite> Favorites { get; set; }
 }

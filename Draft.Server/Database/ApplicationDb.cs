@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Draft.Server.Database;
 
-public class DoubanMovieDb(DbContextOptions options) : DbContext(options) {
+public class ApplicationDb(DbContextOptions options) : DbContext(options) {
 
     public DbSet<UserProfile> Profiles { get; set; }
 

@@ -14,7 +14,7 @@ public class JwtTokenGenerator(
 
     private JwtSettings JwtSettings => settings.Value;
 
-    public string Generate(int userId, string nickname) {
+    public (string, DateTime) Generate(int userId, string nickname) {
         SigningCredentials signingCredentials = new(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings.Secret!)),
             SecurityAlgorithms.HmacSha256
@@ -26,14 +26,16 @@ public class JwtTokenGenerator(
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         ];
 
+        DateTime expires = dateTimeProvider.UtcNow.AddDays(7);
+
         JwtSecurityToken securityToken = new(
             JwtSettings.ValidIssuer,
             JwtSettings.ValidAudience,
             claims,
-            expires: dateTimeProvider.UtcNow.AddDays(7),
+            expires: expires,
             signingCredentials: signingCredentials
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        return (new JwtSecurityTokenHandler().WriteToken(securityToken), expires);
     }
 }

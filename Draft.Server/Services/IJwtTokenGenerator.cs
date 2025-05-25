@@ -1,5 +1,5 @@
 ﻿namespace Draft.Server.Services;
 
 public interface IJwtTokenGenerator {
-    string Generate(int userId, string nickname);
+    (string, DateTime) Generate(int userId, string nickname);
 }
