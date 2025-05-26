@@ -1,13 +1,7 @@
-﻿namespace Draft.Models;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class UserProfile {
-    public int Id { get; set; }
+namespace Draft.Models;
 
-    public required string Nickname { get; set; }
-
-    public required string Email { get; set; }
-
-    public required string PasswordHash { get; set; }
-
-    public required ICollection<Favorite> Favorites { get; set; }
+public class UserProfile : IdentityUser<int> {
+    public ICollection<Favorite> Favorites { get; set; } = [];
 }

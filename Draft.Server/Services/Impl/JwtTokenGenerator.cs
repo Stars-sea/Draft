@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Draft.Server.Services.Authentication;
 using Draft.Server.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -14,19 +15,21 @@ public class JwtTokenGenerator(
 
     private JwtSettings JwtSettings => settings.Value;
 
-    public (string, DateTime) Generate(int userId, string nickname) {
+    public AuthenticationToken Generate(int userId, string email, string username) {
         SigningCredentials signingCredentials = new(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings.Secret!)),
             SecurityAlgorithms.HmacSha256
         );
 
+        DateTime expires = dateTimeProvider.UtcNow.AddDays(7);
+        Guid     id      = Guid.NewGuid();
+
         Claim[] claims = [
             new(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new(JwtRegisteredClaimNames.GivenName, nickname),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new(JwtRegisteredClaimNames.GivenName, username),
+            new(JwtRegisteredClaimNames.Email, email),
+            new(JwtRegisteredClaimNames.Jti, id.ToString())
         ];
-
-        DateTime expires = dateTimeProvider.UtcNow.AddDays(7);
 
         JwtSecurityToken securityToken = new(
             JwtSettings.ValidIssuer,
@@ -36,6 +39,12 @@ public class JwtTokenGenerator(
             signingCredentials: signingCredentials
         );
 
-        return (new JwtSecurityTokenHandler().WriteToken(securityToken), expires);
+        return new AuthenticationToken(
+            id,
+            username,
+            email,
+            new JwtSecurityTokenHandler().WriteToken(securityToken),
+            expires
+        );
     }
 }

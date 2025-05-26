@@ -1,12 +1,14 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using Draft.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Draft.Server.Database;
 
-public class ApplicationDb(DbContextOptions options) : DbContext(options) {
+public class ApplicationDb(DbContextOptions options) : IdentityDbContext<UserProfile, IdentityRole<int>, int>(options) {
 
     public DbSet<UserProfile> Profiles { get; set; }
 

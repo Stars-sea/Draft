@@ -4,7 +4,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services
+       .AddDatabase(builder.Configuration)
+       .AddIdentity()
+       .AddAuthentication(builder.Configuration)
+       .AddInfrastructure();
+
 builder.Services.AddControllers();
 
 
