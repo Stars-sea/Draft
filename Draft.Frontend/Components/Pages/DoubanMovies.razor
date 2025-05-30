@@ -1,6 +1,6 @@
 ﻿@page "/movies"
 @using Draft.Frontend.Api
-@using Draft.Models
+@using Draft.Models.Dto.Movie
 
 @inject IDoubanMovieApi Api
 
@@ -14,7 +14,7 @@
     </p>
 } else {
     <ol>
-        @foreach (DoubanMovie movie in _movies) {
+        @foreach (DoubanMovieResponse movie in _movies) {
             <li>
                 <div class="item" style="display: flex; padding: 16px">
                     <div class="picture" style="width: 150px; float: left; margin-right: 16px">
@@ -41,7 +41,7 @@
 }
 
 @code {
-    private List<DoubanMovie>? _movies;
+    private List<DoubanMovieResponse>? _movies;
 
     protected override async Task OnInitializedAsync() {
         _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).Take(20).ToList();

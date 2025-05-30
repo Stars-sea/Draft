@@ -1,7 +1,7 @@
-﻿using Refit;
-using Draft;
-using Draft.Models;
+﻿using Draft;
+using Draft.Models.Dto.Movie;
 using HtmlAgilityPack;
+using Refit;
 
 const string url = "https://movie.douban.com/top250";
 
@@ -13,14 +13,14 @@ HtmlWeb web = new() {
 IDoubanMoviesApi api = RestService.For<IDoubanMoviesApi>("http://localhost:5229");
 
 for (var i = 0; i < 250; i += 25) {
-    await foreach (DoubanMovie movie in FetchDoubanMovies(i))
+    await foreach (DoubanMovieModifyRequest movie in FetchDoubanMovies(i))
         await api.PutDoubanMovie(movie);
     await Task.Delay(5_000);
 }
 
 return;
 
-async IAsyncEnumerable<DoubanMovie> FetchDoubanMovies(int start) {
+async IAsyncEnumerable<DoubanMovieModifyRequest> FetchDoubanMovies(int start) {
     string       currentUrl = start == 0 ? url : $"{url}?start={start}&filter=";
     HtmlDocument document   = await web.LoadFromWebAsync(currentUrl);
     while (document.Text.Contains("有异常请求")) {
@@ -30,5 +30,6 @@ async IAsyncEnumerable<DoubanMovie> FetchDoubanMovies(int start) {
     }
 
     HtmlNodeCollection nodes = document.DocumentNode.SelectNodes("//div[@class='item']")!;
-    for (var i = 0; i < nodes.Count; ++i) yield return DoubanMovieHelper.ParseFromHtml(nodes[i], start + i);
+    foreach (HtmlNode node in nodes)
+        yield return DoubanMovieHelper.ParseFromHtml(node);
 }

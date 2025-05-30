@@ -2,22 +2,18 @@
 
 namespace Draft.Server.Services.Authentication;
 
-public class AuthenticationResult {
-    public AuthenticationToken? Token { get; init; }
-
-    public required bool Succeeded { get; init; }
-
-    public IEnumerable<IdentityError>? Errors { get; init; } = [];
+public record AuthenticationResult : ResultBase<AuthenticationToken> {
 
     public static AuthenticationResult Success(AuthenticationToken? token)
         => new() {
-            Token     = token,
-            Succeeded = true
+            IsSuccess = true,
+            Errors    = [],
+            Content   = token
         };
 
-    public static AuthenticationResult Failed(params IdentityError[] errors)
+    public static AuthenticationResult Failed(params IEnumerable<IdentityError> errors)
         => new() {
-            Succeeded = false,
-            Errors    = errors
+            IsSuccess = false,
+            Errors    = errors.Select(x => (ErrorMessage)x).ToArray()
         };
 }

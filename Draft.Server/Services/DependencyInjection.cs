@@ -3,6 +3,7 @@ using Draft.Models;
 using Draft.Server.Database;
 using Draft.Server.Services.Authentication;
 using Draft.Server.Services.Impl;
+using Draft.Server.Services.Movie;
 using Draft.Server.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +16,7 @@ namespace Draft.Server.Services;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         => services.AddSingleton<IDateTimeProvider, DateTimeProvider>()
-                   .AddSingleton<IPasswordHasher<UserProfile>, PasswordHasher<UserProfile>>();
+                   .AddScoped<IMovieService, MovieService>();
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         => services.AddDbContext<ApplicationDb>(database => {
@@ -45,7 +46,12 @@ public static class DependencyInjection {
 
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+        services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
+            }
+        ).AddJwtBearer(options =>
             options.TokenValidationParameters = new TokenValidationParameters {
                 ValidateIssuer           = true,
                 ValidateAudience         = true,

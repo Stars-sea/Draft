@@ -1,4 +1,4 @@
-﻿using Draft.Models.Authentication;
+﻿using Draft.Models.Dto.Authentication;
 using Draft.Server.Services.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ public class AuthController(IAuthenticationService authenticationService) : Cont
             loginRequest.Password
         );
 
-        return result.Succeeded ? Ok(result.Token) : Unauthorized(result.Errors);
+        return result.IsSuccess ? Ok(result.Content) : Unauthorized(result.Errors);
     }
 
     [HttpPost("register")]
@@ -26,6 +26,6 @@ public class AuthController(IAuthenticationService authenticationService) : Cont
             registerRequest.Password
         );
 
-        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+        return result.IsSuccess ? Ok() : BadRequest(result.Errors);
     }
 }

@@ -1,58 +1,66 @@
 ﻿using Draft.Models;
-using Draft.Server.Database;
+using Draft.Models.Dto.Movie;
+using Draft.Server.Extensions;
+using Draft.Server.Services;
+using Draft.Server.Services.Movie;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/douban-movies")]
-public class DoubanMoviesController : ControllerBase {
+public class DoubanMoviesController(
+    IMovieService movieService,
+    IDateTimeProvider dateTimeProvider
+) : ControllerBase {
+    
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> PutMovieEntry(DoubanMovieModifyRequest request) {
+        DoubanMovie movie = request.ToModel();
+        if (string.IsNullOrWhiteSpace(movie.Year))
+            movie.Year = dateTimeProvider.UtcNow.Year.ToString();
 
-    // TODO: wrap with service
-    private readonly ApplicationDb _database;
-
-    public DoubanMoviesController(ApplicationDb database) {
-        _database = database;
-        _database.Database.EnsureCreated();
+        MovieOperationResult result = await movieService.CreateMovieAsync(movie);
+        return result
+            ? CreatedAtAction(
+                nameof(GetMovieEntry),
+                new { result.Content!.Id },
+                DoubanMovieResponse.Create(result.Content)
+            )
+            : BadRequest(result.Errors);
     }
 
-    [HttpPut]
-    public async Task<IResult> PutMovieEntry(DoubanMovie movie) {
-        if (await _database.Movies.AnyAsync(m => string.Equals(m.Title, movie.Title)))
-            return Results.Conflict("Movie already exists");
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteMovieEntry(int id) {
+        MovieOperationResult result = await movieService.DeleteMovieAsync(id);
+        return result ? NoContent() : NotFound(result.Errors);
+    }
 
-        await _database.Movies.AddAsync(movie);
-        await _database.SaveChangesAsync();
+    [HttpPost("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> PostMovieEntry(int id, DoubanMovieModifyRequest request) {
+        MovieQueryResults queryResults = await movieService.FindMovieByIdAsync(id);
+        if (!queryResults) return NotFound(queryResults.Errors);
 
-        return Results.Created($"/{movie.Id}", movie);
+        DoubanMovie movie = queryResults.Content!.First();
+        request.Modify(movie);
+
+        MovieOperationResult operationResult = await movieService.UpdateMovieAsync(movie);
+        return operationResult ? Ok(operationResult.Content) : NotFound(operationResult.Errors);
     }
 
     [HttpGet]
-    public async Task<IResult> GetMovieEntries() =>
-        Results.Ok(await _database.Movies.ToListAsync());
+    public IActionResult GetMovieEntries() => Ok(movieService.GetMovies().Content!.Select(DoubanMovieResponse.Create));
 
     [HttpGet("simple")]
-    public async Task<IResult> GetMovieSimple() {
-        return Results.Ok(
-            await _database.Movies
-                           .OrderBy(m => m.Rank)
-                           .Select(m => new DoubanMovieSimple { Id = m.Id, Title = m.Title })
-                           .ToListAsync()
-        );
-    }
+    public IActionResult GetMovieSimple() => Ok(movieService.GetMovies().Content!.Select(DoubanMovieSimpleResponse.Create));
 
     [HttpGet("{id:int}")]
-    public async Task<IResult> GetMovieEntry(int id) =>
-        await _database.Movies.FindAsync(id) is { } movie ? Results.Ok(movie) : Results.NotFound();
-
-    [HttpDelete("{id:int}")]
-    public async Task<IResult> DeleteMovieEntry(int id) {
-        DoubanMovie? movie = await _database.Movies.FindAsync(id);
-        if (movie == null) return Results.NotFound();
-
-        _database.Movies.Remove(movie);
-        await _database.SaveChangesAsync();
-        return Results.NoContent();
+    public async Task<IActionResult> GetMovieEntry(int id) {
+        MovieQueryResults results = await movieService.FindMovieByIdAsync(id);
+        return results ? Ok(results.Content) : NotFound(results.Errors);
     }
 }

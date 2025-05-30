@@ -1,4 +1,4 @@
-﻿namespace Draft.Models.Authentication;
+﻿namespace Draft.Models.Dto.Authentication;
 
 public sealed record AuthenticationResponse(
     Guid Id,

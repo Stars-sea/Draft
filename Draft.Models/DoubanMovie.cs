@@ -1,11 +1,12 @@
 ﻿namespace Draft.Models;
 
-public class DoubanMovie : DoubanMovieSimple {
-    // public int Id { get; set; }
+public class DoubanMovie(string title) {
 
-    public int Rank { get; init; }
+    public int Id { get; init; }
 
-    // public required string Title { get; set; }
+    public string Title { get; set; } = title;
+
+    public int Rank { get; set; }
 
     public required ICollection<string> OtherTitles { get; set; }
 
