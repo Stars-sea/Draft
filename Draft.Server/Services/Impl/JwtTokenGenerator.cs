@@ -8,14 +8,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Draft.Server.Services.Impl;
 
-public class JwtTokenGenerator(
+internal class JwtTokenGenerator(
     IOptions<JwtSettings> settings,
     IDateTimeProvider dateTimeProvider
 ) : IJwtTokenGenerator {
 
     private JwtSettings JwtSettings => settings.Value;
 
-    public AuthenticationToken Generate(int userId, string email, string username) {
+    public AuthenticationToken Generate(string userId, string email, string username) {
         SigningCredentials signingCredentials = new(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings.Secret!)),
             SecurityAlgorithms.HmacSha256
@@ -25,8 +25,8 @@ public class JwtTokenGenerator(
         Guid     id      = Guid.NewGuid();
 
         Claim[] claims = [
-            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new(JwtRegisteredClaimNames.GivenName, username),
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Name, username),
             new(JwtRegisteredClaimNames.Email, email),
             new(JwtRegisteredClaimNames.Jti, id.ToString())
         ];

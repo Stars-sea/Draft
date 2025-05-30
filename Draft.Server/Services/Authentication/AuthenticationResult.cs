@@ -2,7 +2,7 @@
 
 namespace Draft.Server.Services.Authentication;
 
-public record AuthenticationResult : ResultBase<AuthenticationToken> {
+internal record AuthenticationResult : ResultBase<AuthenticationToken> {
 
     public static AuthenticationResult Success(AuthenticationToken? token)
         => new() {

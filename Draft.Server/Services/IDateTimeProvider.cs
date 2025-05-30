@@ -1,5 +1,5 @@
 ﻿namespace Draft.Server.Services;
 
-public interface IDateTimeProvider {
+internal interface IDateTimeProvider {
     DateTime UtcNow { get; }
 }

@@ -1,5 +1,4 @@
-﻿using Draft.Models;
-using Draft.Models.Dto.Movie;
+﻿using Draft.Models.Dto.Movie;
 using Refit;
 
 namespace Draft;
@@ -9,5 +8,5 @@ public interface IDoubanMoviesApi {
 
     [Put("/api/v1/douban-movies")]
     [Headers($"Authorization: Bearer {JwtToken}")]
-    public Task<DoubanMovie> PutDoubanMovie([Body] DoubanMovieModifyRequest movie);
+    public Task<DoubanMovieSimpleResponse> PutDoubanMovie([Body] DoubanMovieModifyRequest movie);
 }

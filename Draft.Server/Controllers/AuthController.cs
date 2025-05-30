@@ -6,7 +6,7 @@ namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController(IAuthenticationService authenticationService) : ControllerBase {
+internal class AuthController(IAuthenticationService authenticationService) : ControllerBase {
 
     [HttpPost("login")]
     public async Task<IActionResult> PostLogin([FromBody] LoginRequest loginRequest) {
@@ -26,6 +26,12 @@ public class AuthController(IAuthenticationService authenticationService) : Cont
             registerRequest.Password
         );
 
-        return result.IsSuccess ? Ok() : BadRequest(result.Errors);
+        return result.IsSuccess
+            ? RedirectToAction(
+                "GetUser",
+                nameof(ProfileController)[..^10],
+                new { registerRequest.Username }
+            )
+            : BadRequest(result.Errors);
     }
 }

@@ -10,11 +10,11 @@ namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/douban-movies")]
-public class DoubanMoviesController(
+internal class DoubanMoviesController(
     IMovieService movieService,
     IDateTimeProvider dateTimeProvider
 ) : ControllerBase {
-    
+
     [HttpPut]
     [Authorize]
     public async Task<IActionResult> PutMovieEntry(DoubanMovieModifyRequest request) {
@@ -27,7 +27,7 @@ public class DoubanMoviesController(
             ? CreatedAtAction(
                 nameof(GetMovieEntry),
                 new { result.Content!.Id },
-                DoubanMovieResponse.Create(result.Content)
+                result.Content!.ToResponse()
             )
             : BadRequest(result.Errors);
     }
@@ -53,10 +53,12 @@ public class DoubanMoviesController(
     }
 
     [HttpGet]
-    public IActionResult GetMovieEntries() => Ok(movieService.GetMovies().Content!.Select(DoubanMovieResponse.Create));
+    public IActionResult GetMovieEntries() =>
+        Ok(movieService.GetMovies().Content!.Select(DoubanMovieExtension.ToResponse));
 
     [HttpGet("simple")]
-    public IActionResult GetMovieSimple() => Ok(movieService.GetMovies().Content!.Select(DoubanMovieSimpleResponse.Create));
+    public IActionResult GetMovieSimple() =>
+        Ok(movieService.GetMovies().Content!.Select(DoubanMovieExtension.ToSimpleResponse));
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetMovieEntry(int id) {

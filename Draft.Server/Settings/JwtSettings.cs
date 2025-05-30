@@ -1,6 +1,6 @@
 ﻿namespace Draft.Server.Settings;
 
-public class JwtSettings {
+internal class JwtSettings {
     public const string Section = "JwtSettings";
 
     public string? ValidIssuer { get; set; }

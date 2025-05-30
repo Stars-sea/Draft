@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Draft.Server.Services.Impl;
 
-public class AuthenticationService(
+internal class AuthenticationService(
     UserManager<UserProfile> userManager,
     SignInManager<UserProfile> signInManager,
     IJwtTokenGenerator tokenGenerator

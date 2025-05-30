@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Draft.Server.Services;
 
-public static class DependencyInjection {
+internal static class DependencyInjection {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         => services.AddSingleton<IDateTimeProvider, DateTimeProvider>()
                    .AddScoped<IMovieService, MovieService>();
@@ -26,7 +26,7 @@ public static class DependencyInjection {
         );
 
     public static IServiceCollection AddIdentity(this IServiceCollection services) {
-        services.AddIdentity<UserProfile, IdentityRole<int>>(options => {
+        services.AddIdentity<UserProfile, IdentityRole>(options => {
                         options.User.RequireUniqueEmail         = true;
                         options.Password.RequireDigit           = true;
                         options.Password.RequiredLength         = 8;

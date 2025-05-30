@@ -1,6 +1,6 @@
 ﻿namespace Draft.Server.Services;
 
-public record ResultBase<TContent> where TContent : notnull {
+internal record ResultBase<TContent> where TContent : notnull {
     public bool IsSuccess { get; init; }
 
     public required IEnumerable<ErrorMessage> Errors { get; init; }

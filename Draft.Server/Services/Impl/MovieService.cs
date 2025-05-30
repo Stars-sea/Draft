@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Draft.Server.Services.Impl;
 
-public class MovieService(ApplicationDb database) : IMovieService {
+internal class MovieService(ApplicationDb database) : IMovieService {
 
     private readonly DbSet<DoubanMovie> _movies = database.Movies;
 
