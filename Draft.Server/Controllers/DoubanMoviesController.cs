@@ -10,7 +10,7 @@ namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/douban-movies")]
-internal class DoubanMoviesController(
+public class DoubanMoviesController(
     IMovieService movieService,
     IDateTimeProvider dateTimeProvider
 ) : ControllerBase {

@@ -2,7 +2,7 @@
 
 namespace Draft.Server.Services.Movie;
 
-internal interface IMovieService {
+public interface IMovieService {
     MovieQueryResults GetMovies();
 
     Task<MovieQueryResults> SearchMovieAsync(string searchTerm);

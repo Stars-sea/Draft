@@ -4,6 +4,7 @@ using Refit;
 
 namespace Draft.Frontend.Api;
 
+[Headers("Authorization: Bearer")]
 public interface IDoubanMovieApi {
     [Put("/api/v1/douban-movies")]
     public Task<DoubanMovie> PutDoubanMovie([Body] DoubanMovie movie);

@@ -6,7 +6,7 @@ namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-internal class AuthController(IAuthenticationService authenticationService) : ControllerBase {
+public class AuthController(IAuthenticationService authenticationService) : ControllerBase {
 
     [HttpPost("login")]
     public async Task<IActionResult> PostLogin([FromBody] LoginRequest loginRequest) {

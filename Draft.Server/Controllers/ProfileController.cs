@@ -8,7 +8,7 @@ namespace Draft.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/profile")]
-internal class ProfileController(UserManager<UserProfile> userManager) : ControllerBase {
+public class ProfileController(UserManager<UserProfile> userManager) : ControllerBase {
     [HttpGet("{username}")]
     public async Task<IActionResult> GetUser(string username) {
         UserProfile? user = await userManager.FindByNameAsync(username);

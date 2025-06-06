@@ -2,7 +2,7 @@
 
 namespace Draft.Server.Services.Movie;
 
-internal record MovieOperationResult : ResultBase<DoubanMovie> {
+public record MovieOperationResult : ResultBase<DoubanMovie> {
     public static MovieOperationResult Success(DoubanMovie? movie)
         => new() {
             IsSuccess = true,

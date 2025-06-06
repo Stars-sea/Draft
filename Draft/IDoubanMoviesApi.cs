@@ -4,7 +4,7 @@ using Refit;
 namespace Draft;
 
 public interface IDoubanMoviesApi {
-    const string JwtToken =
+    const string JwtToken = "...";
 
     [Put("/api/v1/douban-movies")]
     [Headers($"Authorization: Bearer {JwtToken}")]

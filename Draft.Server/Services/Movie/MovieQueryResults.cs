@@ -2,7 +2,7 @@
 
 namespace Draft.Server.Services.Movie;
 
-internal record MovieQueryResults : ResultBase<IEnumerable<DoubanMovie>> {
+public record MovieQueryResults : ResultBase<IEnumerable<DoubanMovie>> {
     public static MovieQueryResults Success(params IEnumerable<DoubanMovie> movies)
         => new() {
             IsSuccess = true,
