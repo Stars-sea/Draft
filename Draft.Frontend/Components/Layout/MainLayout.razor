@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider/>
 <MudPopoverProvider/>
@@ -6,9 +7,36 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        
-        Draft
+    <MudAppBar Elevation="0" Color="Color.Transparent">
+        <MudText Typo="Typo.h5">Draft</MudText>
+        <MudSpacer/>
+
+        <MudGrid Spacing="8" Justify="Justify.Center">
+            <MudItem>
+                <MudButton
+                    Variant="Variant.Text"
+                    Color="@(_selectedPage == 0 ? Color.Primary : Color.Transparent)"
+                    OnClick="@(_ => OnTabBarNavigation(0))">
+                    Home
+                </MudButton>
+            </MudItem>
+            <MudItem>
+                <MudButton
+                    Variant="Variant.Text"
+                    Color="@(_selectedPage == 1 ? Color.Primary : Color.Transparent)"
+                    OnClick="@(_ => OnTabBarNavigation(1))">
+                    Movies
+                </MudButton>
+            </MudItem>
+            <MudItem>
+                <MudButton
+                    Variant="Variant.Text"
+                    Color="@(_selectedPage == 2 ? Color.Primary : Color.Transparent)"
+                    OnClick="@(_ => OnTabBarNavigation(2))">
+                    Favorites
+                </MudButton>
+            </MudItem>
+        </MudGrid>
 
         <MudSpacer/>
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"
@@ -28,3 +56,24 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private int _selectedPage;
+
+    private void OnTabBarNavigation(int index) {
+        _selectedPage = index;
+        Console.WriteLine(1);
+
+        NavigationManager.NavigateTo(
+            index switch {
+                0 => "/",
+                1 => "/movies",
+                2 => "/favorites",
+                _ => "/Error"
+            }
+        );
+        
+        StateHasChanged();
+    }
+
+}

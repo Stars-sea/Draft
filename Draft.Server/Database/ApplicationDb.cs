@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Draft.Server.Database;
 
-internal class ApplicationDb(DbContextOptions options) : IdentityDbContext<UserProfile>(options) {
+public class ApplicationDb(DbContextOptions options) : IdentityDbContext<UserProfile>(options) {
 
     public DbSet<UserProfile> Profiles { get; set; }
 
