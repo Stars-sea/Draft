@@ -7,11 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MudBlazor" Version="8.7.0"/>
         <PackageReference Include="Refit" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Draft.Models\Draft.Models.csproj" />
+        <ProjectReference Include="..\Draft.Models\Draft.Models.csproj"/>
     </ItemGroup>
 
 </Project>

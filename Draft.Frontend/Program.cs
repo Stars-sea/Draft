@@ -1,6 +1,7 @@
 using Draft.Frontend;
 using Draft.Frontend.Api;
 using Draft.Frontend.Components;
+using MudBlazor.Services;
 using Refit;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddSingleton(
 
 builder.Services.AddRazorComponents()
        .AddInteractiveServerComponents();
+
+builder.Services.AddMudServices();
 
 WebApplication app = builder.Build();
 
@@ -31,6 +34,6 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
-app.MapGet("img/{id}", DoubanImageProxy.GetDoubanImage);
+app.MapGet("img/{id:int}", DoubanImageProxy.GetDoubanImage);
 
 app.Run();
