@@ -1,5 +1,5 @@
 ﻿using Draft.Frontend.Api;
-using Draft.Models;
+using Draft.Models.Dto.Movie;
 
 namespace Draft.Frontend;
 
@@ -8,6 +8,8 @@ public static class DoubanImageProxy {
 
     private static readonly Dictionary<int, byte[]> ImageCache = new();
 
+    private static int _currentTaskCount = 0;
+
     static DoubanImageProxy() {
         Client.DefaultRequestHeaders.Add(
             "User-Agent",
@@ -15,13 +17,30 @@ public static class DoubanImageProxy {
         );
     }
 
+    private static async Task<byte[]> GetImageAsync(DoubanMovieResponse movie) {
+        int id = movie.Id!.Value;
+        if (ImageCache.TryGetValue(id, out byte[]? value))
+            return value;
+
+        while (_currentTaskCount > 5) {
+            await Task.Delay(10);
+        }
+
+        var task = Client.GetByteArrayAsync(movie.PreviewImage);
+
+        ++_currentTaskCount;
+        byte[] image = await task;
+        --_currentTaskCount;
+
+        return ImageCache[id] = image;
+    }
+
     public static async Task<IResult> GetDoubanImage(int id, IDoubanMovieApi api) {
-        if (ImageCache.TryGetValue(id, out byte[]? image)) return Results.File(image, "image/jpeg");
+        if (ImageCache.TryGetValue(id, out byte[]? image))
+            return Results.File(image, "image/jpeg");
 
-        DoubanMovie movie = await api.GetDoubanMovie(id);
-        byte[]      bytes = await Client.GetByteArrayAsync(movie.PreviewImage);
-
-        ImageCache[id] = bytes;
+        DoubanMovieResponse movie = await api.GetDoubanMovie(id);
+        byte[]              bytes = await GetImageAsync(movie);
         return Results.File(bytes, "image/jpeg");
     }
 }

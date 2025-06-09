@@ -16,7 +16,7 @@ public interface IDoubanMovieApi {
     Task<List<DoubanMovieSimpleResponse>> GetDoubanMoviesSimple();
 
     [Get("/api/v1/douban-movies/{id}")]
-    Task<DoubanMovie> GetDoubanMovie(int id);
+    Task<DoubanMovieResponse> GetDoubanMovie(int id);
 
     [Delete("/api/v1/douban-movies/{id}")]
     Task DeleteDoubanMovie(int id);

@@ -8,9 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Draft.Server.Database;
 
 public class ApplicationDb(DbContextOptions options) : IdentityDbContext<UserProfile>(options) {
-
-    public DbSet<UserProfile> Profiles { get; set; }
-
+    
     public DbSet<DoubanMovie> Movies { get; set; }
 
     public DbSet<Favorite> Favorites { get; set; }

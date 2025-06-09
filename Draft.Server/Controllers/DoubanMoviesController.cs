@@ -63,6 +63,6 @@ public class DoubanMoviesController(
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetMovieEntry(int id) {
         MovieQueryResults results = await movieService.FindMovieByIdAsync(id);
-        return results ? Ok(results.Content) : NotFound(results.Errors);
+        return results ? Ok(results.Content!.First().ToResponse()) : NotFound(results.Errors);
     }
 }
