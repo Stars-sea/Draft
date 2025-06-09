@@ -7,11 +7,12 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar Elevation="0" Color="Color.Transparent">
-        <MudText Typo="Typo.h5">Draft</MudText>
+    <MudAppBar Elevation="0" Color="Color.Transparent" style="backdrop-filter: blur(12px)">
+        <MudIconButton Icon="@Icons.Material.Filled.Movie" Color="Color.Inherit"
+                       Href="https://github.com/Stars-sea/Draft" Target="_blank"/>
         <MudSpacer/>
 
-        <MudGrid Spacing="8" Justify="Justify.Center">
+        <MudGrid Class="ps-4" Spacing="8" Justify="Justify.FlexStart">
             <MudItem>
                 <MudButton
                     Variant="Variant.Text"
@@ -39,8 +40,8 @@
         </MudGrid>
 
         <MudSpacer/>
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"
-                       Href="https://github.com/Stars-sea/Draft" Target="_blank"/>
+        <MudIconButton Icon="@Icons.Material.Outlined.AccountCircle" Color="Color.Inherit"
+                       OnClick="@(_ => OnTabBarNavigation(3))"/>
     </MudAppBar>
 
     <MudMainContent Class="pt-16 px-16">
@@ -60,20 +61,28 @@
 @code {
     private int _selectedPage;
 
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        _selectedPage = new Uri(NavigationManager.Uri).AbsolutePath switch {
+            "/movies"    => 1,
+            "/favorites" => 2,
+            "/login"     => 3,
+            _            => 0
+        };
+    }
+
     private void OnTabBarNavigation(int index) {
         _selectedPage = index;
-        Console.WriteLine(1);
 
         NavigationManager.NavigateTo(
             index switch {
                 0 => "/",
                 1 => "/movies",
                 2 => "/favorites",
+                3 => "/login",
                 _ => "/Error"
             }
         );
-        
-        StateHasChanged();
     }
 
 }

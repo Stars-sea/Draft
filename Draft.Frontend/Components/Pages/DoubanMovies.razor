@@ -4,47 +4,50 @@
 
 @inject IDoubanMovieApi Api
 
-<PageTitle>Douban Movies</PageTitle>
+<PageTitle>Douban Top Movies</PageTitle>
 
-<h1>Douban Movies</h1>
+<MudGrid Justify="Justify.Center" Spacing="8">
+    <MudItem xs="12">
+        <MudText Typo="Typo.h4">Douban Top 250</MudText>
+    </MudItem>
+    <MudFlexBreak/>
 
-@if (_movies is null) {
-    <p>
-        <em>Loading...</em>
-    </p>
-} else {
-    <ol>
-        @foreach (DoubanMovieResponse movie in _movies) {
-            <li>
-                <div class="item" style="display: flex; padding: 16px">
-                    <div class="picture" style="width: 150px; float: left; margin-right: 16px">
-                        <a href="@movie.Url">
-                            <img width="150" height="100%" src="/img/@movie.Id" alt="@movie.Title"/>
-                        </a>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; flex-direction: column">
-                        <h2 style="font-size: x-large"><a href="@movie.Url">@movie.Title</a></h2>
-                        <div>
-                            <p>
-                                <span>@movie.StaffInfos</span>
-                                <br/>
-                                <span>@movie.Year / @movie.Region / @string.Join(' ', movie.Tags)</span>
-                            </p>
-                            <p>@movie.Rating, Rated by @movie.RatingCount persons.</p>
-                            <p>@movie.Quote </p>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        }
-    </ol>
-}
+    @foreach (DoubanMovieResponse movie in _movies) {
+        <MudItem xs="3">
+            <MudCard>
+                <MudCardMedia Image=@($"/img/{movie.Id}")/>
+                <MudCardContent>
+                    <MudStack Row="true" AlignItems="AlignItems.Baseline"
+                              Justify="Justify.SpaceBetween">
+                        <MudText Typo="Typo.h5">@movie.Title</MudText>
+                        <MudText Typo="Typo.h4" style="opacity: 40%">#@movie.Rank</MudText>
+                    </MudStack>
+
+                    <MudText Typo="Typo.caption">@movie.Year</MudText>
+                    <MudText Typo="Typo.caption">@string.Join('/', movie.OtherTitles ?? [])</MudText>
+
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <MudRating SelectedValue="@((int)movie.Rating! / 2)" MaxValue="5" ReadOnly="true"/>
+                        <MudText>@movie.Rating</MudText>
+                    </MudStack>
+
+                    <MudText>@movie.Quote</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@movie.Url" Target="_blank">
+                        View on Douban
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
 
 @code {
-    private List<DoubanMovieResponse>? _movies;
+    private List<DoubanMovieResponse> _movies = [];
 
     protected override async Task OnInitializedAsync() {
-        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).Take(20).ToList();
+        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).ToList();
     }
 
 }
