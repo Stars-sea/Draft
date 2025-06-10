@@ -15,5 +15,4 @@
     <ItemGroup>
         <ProjectReference Include="..\Draft.Models\Draft.Models.csproj"/>
     </ItemGroup>
-
 </Project>

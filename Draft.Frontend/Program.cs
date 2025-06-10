@@ -10,6 +10,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(
     RestService.For<IDoubanMovieApi>(builder.Configuration["ApiUrl"]!)
 );
+builder.Services.AddSingleton(
+    RestService.For<IAuthApi>(builder.Configuration["ApiUrl"]!)
+);
+builder.Services.AddSingleton(
+    RestService.For<IProfileApi>(builder.Configuration["ApiUrl"]!)
+);
 
 builder.Services.AddRazorComponents()
        .AddInteractiveServerComponents();

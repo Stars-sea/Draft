@@ -1,8 +1,76 @@
 ﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using Draft.Frontend.Api
+@using Draft.Models.Dto.Authentication
 
-<h3>Login</h3>
+@inject IAuthApi AuthApi
+
+<MudStack AlignItems="AlignItems.Center" Style="padding-top: 10%">
+  <MudPaper Class="pa-8" Elevation="5" Style="width: 35%">
+    <MudStack Justify="Justify.SpaceBetween" Spacing="10">
+      <MudText Typo="Typo.h4">Login</MudText>
+
+      <MudForm @ref="_form">
+        <MudTextField T="string" Label="Email" @ref="_emailField"
+                      Required="true" RequiredError="Email is required!"
+                      Validation="@(new EmailAddressAttribute { ErrorMessage = "The email address is invalid" })"/>
+        <MudTextField T="string" Label="Password" @ref="_pwdField" InputType="InputType.Password"
+                      Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                      RequiredError="Password is required!"/>
+      </MudForm>
+
+      <MudLink Href="/register">No account? Join us!</MudLink>
+    </MudStack>
+  </MudPaper>
+  <MudPaper Class="pa-6 mt-4" Elevation="5" Style="width: 35%">
+    <MudStack Justify="Justify.FlexEnd" Row="true">
+      <MudButton Variant="Variant.Text" DropShadow="false">Forgot passwords?</MudButton>
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(_ => UserLoginAsync())">
+        Login
+      </MudButton>
+    </MudStack>
+  </MudPaper>
+</MudStack>
 
 @code {
 
+  private MudForm              _form       = new();
+  private MudTextField<string> _emailField = new();
+  private MudTextField<string> _pwdField   = new();
+
+  private static IEnumerable<string> PasswordStrength(string pw) {
+    if (string.IsNullOrWhiteSpace(pw)) {
+      yield return "Password is required!";
+      yield break;
+    }
+
+    if (pw.Length < 8)
+      yield return "Password must be at least of length 8";
+    if (!Regex.IsMatch(pw, "[A-Z]"))
+      yield return "Password must contain at least one capital letter";
+    if (!Regex.IsMatch(pw, "[a-z]"))
+      yield return "Password must contain at least one lowercase letter";
+    if (!Regex.IsMatch(pw, "[0-9]"))
+      yield return "Password must contain at least one digit";
+  }
+
+  private async Task UserLoginAsync() {
+    await _form.Validate();
+    if (!_form.IsValid) return;
+
+    LoginRequest request = new(
+      _emailField.Value!,
+      _pwdField.Value!
+    );
+    try {
+      AuthenticationResponse resp = await AuthApi.Login(request);
+      
+      // TODO
+    }
+    catch (Exception e) {
+      _form.Errors = [e.Message];
+    }
+  }
 
 }
