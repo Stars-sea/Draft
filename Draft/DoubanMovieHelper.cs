@@ -5,7 +5,32 @@ using HtmlAgilityPack;
 namespace Draft;
 
 public static partial class DoubanMovieHelper {
-    public static DoubanMovieModifyRequest ParseFromHtml(HtmlNode node) {
+    private static readonly HttpClient Client = new();
+
+    private static int _currentTaskCount;
+
+    static DoubanMovieHelper() {
+        Client.DefaultRequestHeaders.Add(
+            "User-Agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+        );
+    }
+
+    private static async Task<string> GetImageAsync(string url) {
+        while (_currentTaskCount > 5) {
+            await Task.Delay(10);
+        }
+
+        var task = Client.GetByteArrayAsync(url);
+
+        ++_currentTaskCount;
+        byte[] image = await task;
+        --_currentTaskCount;
+
+        return Convert.ToBase64String(image);
+    }
+
+    public static async Task<DoubanMovieModifyRequest> ParseFromHtmlAsync(HtmlNode node) {
         HtmlNode ratingNode = node.SelectSingleNode(".//span[@class='rating_num']")!;
 
         int     rank        = int.Parse(node.SelectSingleNode(".//em")!.InnerText);
@@ -36,17 +61,17 @@ public static partial class DoubanMovieHelper {
         string[] infos      = descriptions[1].Split('/').Select(s => s.Trim()).ToArray();
 
         return new DoubanMovieModifyRequest(title) {
-            Rank         = rank,
-            OtherTitles  = otherTitles,
-            StaffInfos   = staffInfos,
-            Year         = string.Join('/', infos[..^2]),
-            Region       = infos[^2],
-            Tags         = infos[^1].Split(' ').ToList(),
-            Rating       = rating,
-            RatingCount  = ratingCount,
-            Quote        = quote,
-            Url          = url,
-            PreviewImage = image
+            Rank               = rank,
+            OtherTitles        = otherTitles,
+            StaffInfos         = staffInfos,
+            Year               = string.Join('/', infos[..^2]),
+            Region             = infos[^2],
+            Tags               = infos[^1].Split(' ').ToList(),
+            Rating             = rating,
+            RatingCount        = ratingCount,
+            Quote              = quote,
+            Url                = url,
+            PreviewImageBase64 = await GetImageAsync(url),
         };
     }
 

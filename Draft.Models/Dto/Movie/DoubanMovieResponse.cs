@@ -17,6 +17,5 @@ public sealed record DoubanMovieResponse(
     int? RatingCount,
     int? Rank,
     string? Quote,
-    string? Url,
-    string? PreviewImage
+    string? Url
 );

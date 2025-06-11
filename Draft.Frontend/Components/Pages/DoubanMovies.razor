@@ -1,8 +1,13 @@
 ﻿@page "/movies"
-@using Draft.Frontend.Api
+@using Draft.Frontend.Services
+@using Draft.Frontend.Services.Api
 @using Draft.Models.Dto.Movie
+@using Microsoft.Extensions.Options
 
-@inject IDoubanMovieApi Api
+@inject IDoubanMovieApi MovieApi
+@inject IProfileApi ProfileApi
+@inject IOptions<ApiSettings> ApiSettings
+@inject IAuthTokenProvider TokenProvider
 
 <PageTitle>Douban Top Movies</PageTitle>
 
@@ -12,10 +17,10 @@
     </MudItem>
     <MudFlexBreak/>
 
-    @foreach (DoubanMovieResponse movie in _movies) {
+    @foreach ((DoubanMovieResponse movie, bool isFavored) in DisplayMovies) {
         <MudItem xs="3">
             <MudCard>
-                <MudCardMedia Image=@($"/img/{movie.Id}")/>
+                <MudCardMedia Image=@($"{ApiSettings.Value.BaseUrl}/api/v1/douban-movies/{movie.Id}/img")/>
                 <MudCardContent>
                     <MudStack Row="true" AlignItems="AlignItems.Baseline"
                               Justify="Justify.SpaceBetween">
@@ -37,17 +42,62 @@
                     <MudButton Variant="Variant.Text" Color="Color.Primary" Href="@movie.Url" Target="_blank">
                         View on Douban
                     </MudButton>
+
+                    <MudToggleIconButton
+                        Toggled="isFavored"
+                        Icon="@Icons.Material.Outlined.Favorite" Color="Color.Primary"
+                        ToggledIcon="@Icons.Material.Filled.Favorite" ToggledColor="Color.Error"
+                        ToggledChanged="toggled => OnFavoriteClick(movie, toggled)">
+                    </MudToggleIconButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
     }
+
+    <MudItem xs="12" Class="pb-8">
+        <MudPagination Count="@PageCount" @bind-Selected="@_selected"/>
+    </MudItem>
 </MudGrid>
 
 @code {
-    private List<DoubanMovieResponse> _movies = [];
+    private const int CountPerPage = 12;
+    
+    private int _selected;
+    
+    private Dictionary<DoubanMovieResponse, bool>? _movies;
 
-    protected override async Task OnInitializedAsync() {
-        _movies = (await Api.GetDoubanMovies()).OrderBy(m => m.Rank).ToList();
+    private IEnumerable<KeyValuePair<DoubanMovieResponse, bool>> DisplayMovies
+        => _movies?.Skip(SelectedPageIndex * CountPerPage).Take(CountPerPage) ?? [];
+
+    private int SelectedPageIndex => _selected - 1;
+    private int PageCount => (_movies?.Count ?? CountPerPage) / CountPerPage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (_movies != null) return;
+
+        var movies = await MovieApi.GetDoubanMovies();
+
+        if (!await TokenProvider.IsTokenStored())
+            _movies = movies.OrderBy(m => m.Rank)
+                            .ToDictionary(m => m, _ => false);
+        else {
+            var favorites = await ProfileApi.GetFavorites();
+            _movies = movies.OrderBy(m => m.Rank)
+                            .ToDictionary(m => m,
+                                m => favorites.Any(f => f.Id == m.Id));
+        }
+        StateHasChanged();
+    }
+
+    private void OnFavoriteClick(DoubanMovieResponse movie, bool isToggled) {
+        if (movie.Id == null) return;
+
+        if (isToggled)
+            ProfileApi.AddFavorite(movie.Id.Value);
+        else ProfileApi.RemoveFavorite(movie.Id.Value);
+
+        _movies![movie] = isToggled;
+        StateHasChanged();
     }
 
 }

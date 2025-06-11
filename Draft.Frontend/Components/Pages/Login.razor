@@ -2,12 +2,13 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 @using Blazored.LocalStorage
-@using Draft.Frontend.Api
+@using Draft.Frontend.Services.Api
 @using Draft.Models.Dto.Authentication
-@using MudBlazor.Interfaces
+@using Microsoft.Extensions.Options
 @using Refit
 
 @inject IAuthApi AuthApi
+@inject IOptions<ApiSettings> ApiSettings
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 
@@ -77,13 +78,13 @@
     );
     try {
       AuthenticationResponse resp = await AuthApi.Login(request);
-      await LocalStorage.SetItemAsync(ApiFactory.TokenStorageKey, resp);
+      await LocalStorage.SetItemAsync(ApiSettings.Value.TokenStorageKey, resp);
       NavigationManager.NavigateTo("/");
     }
     catch (ApiException e) {
       _errorMsg = e.ReasonPhrase;
       
-      await LocalStorage.RemoveItemAsync(ApiFactory.TokenStorageKey);
+      await LocalStorage.RemoveItemAsync(ApiSettings.Value.TokenStorageKey);
     }
   }
 

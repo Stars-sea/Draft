@@ -27,7 +27,7 @@ public class ProfileController(
     }
 
     [HttpGet("{username}")]
-    public async Task<IActionResult> GetUser(string username) {
+    public async Task<ActionResult<DoubanMovieSimpleResponse>> GetUser(string username) {
         UserProfile? user = await userManager.FindByNameAsync(username);
         if (user == null) return NotFound();
 
@@ -45,12 +45,25 @@ public class ProfileController(
     }
 
     // TODO: impl favorites service
+
+    [HttpGet("favorites/{movieId:int}")]
+    [Authorize]
+    public async Task<ActionResult<Favorite>> GetFavorites(int movieId) {
+        UserProfile? user = await GetUserFromTokenAsync();
+        if (user == null) return NotFound();
+
+        Favorite? favorite = user.Favorites.FirstOrDefault(f => f.MovieId == movieId);
+        return favorite != null ? Ok(favorite) : NotFound();
+    }
     
     [HttpPost("favorites/{movieId:int}")]
     [Authorize]
     public async Task<IActionResult> AddFavorite(int movieId) {
         UserProfile? user = await GetUserFromTokenAsync();
         if (user == null) return NotFound();
+        
+        if (user.Favorites.Any(f => f.MovieId == movieId))
+            return Conflict();
 
         MovieQueryResults movieResult = await movieService.FindMovieByIdAsync(movieId);
         if (!movieResult.IsSuccess) return NotFound();

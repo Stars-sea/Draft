@@ -21,5 +21,5 @@ public sealed record DoubanMovieModifyRequest(string Title) {
 
     public string? Url { get; set; }
 
-    public string? PreviewImage { get; set; }
+    public string? PreviewImageBase64 { get; set; }
 }

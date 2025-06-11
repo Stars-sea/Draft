@@ -17,8 +17,7 @@ internal static class DoubanMovieExtension {
             movie.RatingCount,
             movie.Rank,
             movie.Quote,
-            movie.Url,
-            movie.PreviewImage
+            movie.Url
         );
 
     public static DoubanMovieSimpleResponse ToSimpleResponse(this DoubanMovie movie)

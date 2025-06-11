@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Refit;
 
-namespace Draft.Frontend.Api;
+namespace Draft.Frontend.Services.Api;
 
 public interface IAuthApi {
     [Post("/api/v1/auth/login")]

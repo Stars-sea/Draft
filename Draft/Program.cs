@@ -12,10 +12,13 @@ HtmlWeb web = new() {
 
 IDoubanMoviesApi api = RestService.For<IDoubanMoviesApi>("http://localhost:5229");
 
-for (var i = 0; i < 250; i += 25) {
+const int last = 115;
+
+for (int i = (last + 1) / 25 * 25; i < 250; i += 25) {
     await foreach (DoubanMovieModifyRequest movie in FetchDoubanMovies(i))
         await api.PutDoubanMovie(movie);
     await Task.Delay(5_000);
+    Console.WriteLine($"已成功推送 {i + 25} 个");
 }
 
 return;
@@ -29,7 +32,10 @@ async IAsyncEnumerable<DoubanMovieModifyRequest> FetchDoubanMovies(int start) {
         document = await web.LoadFromWebAsync(currentUrl);
     }
 
-    HtmlNodeCollection nodes = document.DocumentNode.SelectNodes("//div[@class='item']")!;
+    IEnumerable<HtmlNode> nodes = document.DocumentNode.SelectNodes("//div[@class='item']")!;
+    if (start < last)
+        nodes = nodes.Skip(last - start);
+    
     foreach (HtmlNode node in nodes)
-        yield return DoubanMovieHelper.ParseFromHtml(node);
+        yield return await DoubanMovieHelper.ParseFromHtmlAsync(node);
 }

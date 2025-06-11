@@ -1,13 +1,11 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
-@using Blazored.LocalStorage
-@using Draft.Frontend.Api
+@using Draft.Frontend.Services.Api
 @using Draft.Models.Dto.Authentication
 @using Refit
 
 @inject IAuthApi AuthApi
-@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 
 <PageTitle>Register - Draft</PageTitle>
@@ -80,8 +78,7 @@
     );
     try {
       AuthenticationResponse resp = await AuthApi.Register(request);
-      await LocalStorage.SetItemAsync(ApiFactory.TokenStorageKey, resp);
-      NavigationManager.NavigateTo("/");
+      NavigationManager.NavigateTo("/login");
     }
     catch (ApiException e) {
       _errorMsg = e.ReasonPhrase;

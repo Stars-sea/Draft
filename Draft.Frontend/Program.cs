@@ -7,7 +7,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddRefit(builder.Configuration);
+builder.Services.AddSettings(builder.Configuration);
+builder.Services.AddRefit();
 
 builder.Services.AddRazorComponents()
        .AddInteractiveServerComponents()
@@ -33,7 +34,5 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode()
    .AddInteractiveWebAssemblyRenderMode();
-
-app.MapGet("img/{id:int}", DoubanImageProxy.GetDoubanImage);
 
 app.Run();

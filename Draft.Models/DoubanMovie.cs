@@ -26,7 +26,7 @@ public class DoubanMovie(string title) {
 
     public required string Url { get; set; }
 
-    public required string PreviewImage { get; set; }
+    public required string PreviewImageBase64 { get; set; }
 
     public required ICollection<Favorite> Favorites { get; set; }
 }

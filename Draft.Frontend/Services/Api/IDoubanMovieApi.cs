@@ -2,7 +2,7 @@
 using Draft.Models.Dto.Movie;
 using Refit;
 
-namespace Draft.Frontend.Api;
+namespace Draft.Frontend.Services.Api;
 
 [Headers("Authorization: Bearer")]
 public interface IDoubanMovieApi {
