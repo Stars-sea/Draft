@@ -1,24 +1,17 @@
+using Blazored.LocalStorage;
 using Draft.Frontend;
-using Draft.Frontend.Api;
 using Draft.Frontend.Components;
 using MudBlazor.Services;
-using Refit;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton(
-    RestService.For<IDoubanMovieApi>(builder.Configuration["ApiUrl"]!)
-);
-builder.Services.AddSingleton(
-    RestService.For<IAuthApi>(builder.Configuration["ApiUrl"]!)
-);
-builder.Services.AddSingleton(
-    RestService.For<IProfileApi>(builder.Configuration["ApiUrl"]!)
-);
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddRefit(builder.Configuration);
 
 builder.Services.AddRazorComponents()
-       .AddInteractiveServerComponents();
+       .AddInteractiveServerComponents()
+       .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddMudServices();
 
@@ -38,7 +31,8 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
-   .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode()
+   .AddInteractiveWebAssemblyRenderMode();
 
 app.MapGet("img/{id:int}", DoubanImageProxy.GetDoubanImage);
 

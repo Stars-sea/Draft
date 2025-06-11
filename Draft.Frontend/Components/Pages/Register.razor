@@ -1,17 +1,16 @@
-﻿@page "/login"
+﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
 @using Blazored.LocalStorage
 @using Draft.Frontend.Api
 @using Draft.Models.Dto.Authentication
-@using MudBlazor.Interfaces
 @using Refit
 
 @inject IAuthApi AuthApi
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
 
-<PageTitle>Login - Draft</PageTitle>
+<PageTitle>Register - Draft</PageTitle>
 
 <MudStack AlignItems="AlignItems.Center" Style="padding-top: 10%">
   <MudPaper Class="pa-8" Elevation="5" Style="width: 35%">
@@ -19,6 +18,8 @@
       <MudText Typo="Typo.h4">Login</MudText>
 
       <MudForm @ref="_form">
+        <MudTextField T="string" Label="Username" @ref="_nameField"
+                      Required="true" RequiredError="Username is required!"/>
         <MudTextField T="string" Label="Email" @ref="_emailField"
                       Required="true" RequiredError="Email is required!"
                       Validation="@(new EmailAddressAttribute { ErrorMessage = "The email address is invalid" })"/>
@@ -27,7 +28,7 @@
                       RequiredError="Password is required!"/>
       </MudForm>
 
-      <MudLink Href="/register">No account? Join us!</MudLink>
+      <MudLink Href="/login">Already have a account? Login!</MudLink>
       @if (_errorMsg != null) {
         <MudText Typo="Typo.body1" Color="Color.Error">@_errorMsg</MudText>
       }
@@ -35,9 +36,9 @@
   </MudPaper>
   <MudPaper Class="pa-6 mt-4" Elevation="5" Style="width: 35%">
     <MudStack Justify="Justify.FlexEnd" Row="true">
-      <MudButton Variant="Variant.Text" DropShadow="false">Forgot passwords?</MudButton>
-      <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(_ => UserLoginAsync())">
-        Login
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false"
+                 OnClick="@(_ => UserRegisterAsync())">
+        Register
       </MudButton>
     </MudStack>
   </MudPaper>
@@ -46,6 +47,7 @@
 @code {
 
   private MudForm              _form       = new();
+  private MudTextField<string> _nameField  = new();
   private MudTextField<string> _emailField = new();
   private MudTextField<string> _pwdField   = new();
 
@@ -67,24 +69,25 @@
       yield return "Password must contain at least one digit";
   }
 
-  private async Task UserLoginAsync() {
+  private async Task UserRegisterAsync() {
     await _form.Validate();
     if (!_form.IsValid) return;
 
-    LoginRequest request = new(
+    RegisterRequest request = new(
+      _nameField.Value!,
       _emailField.Value!,
       _pwdField.Value!
     );
     try {
-      AuthenticationResponse resp = await AuthApi.Login(request);
+      AuthenticationResponse resp = await AuthApi.Register(request);
       await LocalStorage.SetItemAsync(ApiFactory.TokenStorageKey, resp);
       NavigationManager.NavigateTo("/");
     }
     catch (ApiException e) {
       _errorMsg = e.ReasonPhrase;
-      
-      await LocalStorage.RemoveItemAsync(ApiFactory.TokenStorageKey);
     }
+    
+    StateHasChanged();
   }
 
 }

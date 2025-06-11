@@ -22,8 +22,8 @@ public class ProfileController(
 
     [NonAction]
     private async Task<UserProfile?> GetUserFromTokenAsync() {
-        string username = User.Claims.First(c => c.Type == ClaimTypes.Name).Value;
-        return await userManager.FindByNameAsync(username);
+        string? username = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
+        return username == null ? null : await userManager.FindByNameAsync(username);
     }
 
     [HttpGet("{username}")]
@@ -34,6 +34,14 @@ public class ProfileController(
         return User.HasClaim(JwtRegisteredClaimNames.Name, user.UserName!)
             ? Ok(user.ToDetailedResponse())
             : Ok(user.ToResponse());
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetUser() {
+        UserProfile? profile = await GetUserFromTokenAsync();
+        if (profile == null) return Unauthorized();
+        return Ok(profile.ToDetailedResponse());
     }
 
     // TODO: impl favorites service

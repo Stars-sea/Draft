@@ -1,7 +1,45 @@
 ﻿@page "/"
+@using Draft.Frontend.Api
+@using Draft.Models.Dto.Movie
+@using Draft.Models.Dto.Profile
+@using Refit
+
+@inject IProfileApi ProfileApi
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Home</MudText>
 
-Welcome to your new app.
+    @if (_profile != null) {
+        <MudText Typo="Typo.body1">Welcome, @_profile.Username</MudText>
+        <MudText Typo="Typo.body2">@_profile.Email</MudText>
+
+        <MudList T="DoubanMovieSimpleResponse">
+            @foreach (DoubanMovieSimpleResponse movie in _movies ?? []) {
+                <MudListItem T="DoubanMovieSimpleResponse" Value="movie" Text=@($"{movie.Id:>04} {movie.Title}")/>
+            }
+        </MudList>
+    }
+    else {
+        <MudText Typo="Typo.body1">请登录</MudText>
+    }
+</MudPaper>
+
+@code {
+
+    private DetailedProfileResponse? _profile;
+
+    private ICollection<DoubanMovieSimpleResponse>? _movies;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        try {
+            _profile = await ProfileApi.GetProfile();
+            _movies  = await ProfileApi.GetFavorites();
+        }
+        catch (ApiException) {
+            _profile = null;
+        }
+        StateHasChanged();
+    }
+}
